@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>收菜倒计时小助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f9e9 0%, #d8e8c6 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-top: 15px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #4a6b2d;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #6a8454;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .notification {
+            background: #ffe082;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #5d4037;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .plant-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(139, 169, 110, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .plant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #8bc34a 0%, #4caf50 100%);
+        }
+        
+        .plant-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .plant-icon {
+            width: 42px;
+            height: 42px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 22px;
+        }
+        
+        .plant-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #4a6b2d;
+        }
+        
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .progress-circle {
+            width: 180px;
+            height: 180px;
+            position: relative;
+        }
+        
+        .progress-bg, .progress {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        .progress-bg {
+            stroke: #e8f5e9;
+        }
+        
+        .progress {
+            stroke: #8bc34a;
+            transition: stroke-dashoffset 0.7s linear;
+        }
+        
+        .time-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .time {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4a6b2d;
+            margin-bottom: 5px;
+        }
+        
+        .status {
+            font-size: 14px;
+            color: #6a8454;
+        }
+        
+        .btn {
+            background: #8bc34a;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(139, 195, 74, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(139, 195, 74, 0.3);
+        }
+        
+        .btn-reset {
+            background: #ff9800;
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+        
+        .notification-permission {
+            background: #f1f8e9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #6a8454;
+        }
+        
+        .permission-btn {
+            background: #ff9800;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+        
+        .notification-permission p {
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6a8454;
+            font-size: 14px;
+        }
+        
+        .audio-control {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .audio-control label {
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 340px) {
+            .progress-circle {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .time {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>收菜倒计时小助手</h1>
+            <p class="subtitle">轻松管理您的作物收获时间</p>
+            
+            <div class="notification">
+                <i class="fas fa-info-circle"></i>
+                <div>即使关闭浏览器，再次打开时也会显示正确的剩余时间</div>
+            </div>
+        </header>
+        
+        <div class="plant-card">
+            <div class="plant-title">
+                <div class="plant-icon">🌱</div>
+                <div class="plant-name">14.4小时作物</div>
+            </div>
+            
+            <div class="timer-container">
+                <div class="progress-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress" id="progress1" cx="50" cy="50" r="45" stroke-dasharray="283"></circle>
+                    </svg>
+                    <div class="time-display">
+                        <div id="time1" class="time">14:24:00</div>
+                        <div id="status1" class="status">生长中...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="reset1" class="btn btn-reset">重置倒计时</button>
+        </div>
+        
+        <div class="plant-card">
+            <div class="plant-title">
+                <div class="plant-icon">🌿</div>
+                <div class="plant-name">3.6小时作物</div>
+            </div>
+            
+            <div class="timer-container">
+                <div class="progress-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress" id="progress2" cx="50" cy="50" r="45" stroke-dasharray="283"></circle>
+                    </svg>
+                    <div class="time-display">
+                        <div id="time2" class="time">03:36:00</div>
+                        <div id="status2" class="status">生长中...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="reset2" class="btn btn-reset">重置倒计时</button>
+        </div>
+        
+        <div class="audio-control">
+            <input type="checkbox" id="sound-enabled" checked>
+            <label for="sound-enabled">提醒时播放声音</label>
+        </div>
+        
+        <div class="notification-permission">
+            <p>为了在倒计时结束时收到提醒，请允许浏览器通知权限</p>
+            <button id="enable-notifications" class="btn permission-btn">启用通知</button>
+        </div>
+        
+        <footer>
+            <p>即使关闭页面，重新打开时也会显示正确的剩余时间</p>
+        </footer>
+    </div>
+
+    <!-- 音频元素用于提醒 -->
+    <audio id="alarm-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 作物生长时间（以秒为单位）
+            const PLANT1_TIME = 14.4 * 60 * 60;  // 14.4小时
+            const PLANT2_TIME = 3.6 * 60 * 60;   // 3.6小时
+            
+            // 获取DOM元素
+            const timeDisplay1 = document.getElementById('time1');
+            const timeDisplay2 = document.getElementById('time2');
+            const status1 = document.getElementById('status1');
+            const status2 = document.getElementById('status2');
+            const resetBtn1 = document.getElementById('reset1');
+            const resetBtn2 = document.getElementById('reset2');
+            const progress1 = document.getElementById('progress1');
+            const progress2 = document.getElementById('progress2');
+            const enableNotificationsBtn = document.getElementById('enable-notifications');
+            const soundCheckbox = document.getElementById('sound-enabled');
+            const alarmSound = document.getElementById('alarm-sound');
+            
+            // 初始化计时器对象
+            let timers = {
+                plant1: {
+                    interval: null,
+                    finished: false
+                },
+                plant2: {
+                    interval: null,
+                    finished: false
+                }
+            };
+            
+            // 从localStorage加载保存的状态
+            function loadSavedState() {
+                const now = Math.floor(Date.now() / 1000);
+                
+                // 植物1
+                const plant1Start = localStorage.getItem('plant1Start');
+                if (plant1Start) {
+                    const elapsed = now - parseInt(plant1Start);
+                    const remaining = Math.max(0, PLANT1_TIME - elapsed);
+                    
+                    if (remaining <= 0) {
+                        // 计时已结束
+                        showFinishedState('plant1');
+                    } else {
+                        // 计时仍在进行
+                        updateDisplay('plant1', remaining);
+                        startTimer('plant1', remaining);
+                    }
+                } else {
+                    // 没有保存的状态，初始化
+                    updateDisplay('plant1', PLANT1_TIME);
+                }
+                
+                // 植物2
+                const plant2Start = localStorage.getItem('plant2Start');
+                if (plant2Start) {
+                    const elapsed = now - parseInt(plant2Start);
+                    const remaining = Math.max(0, PLANT2_TIME - elapsed);
+                    
+                    if (remaining <= 0) {
+                        // 计时已结束
+                        showFinishedState('plant2');
+                    } else {
+                        // 计时仍在进行
+                        updateDisplay('plant2', remaining);
+                        startTimer('plant2', remaining);
+                    }
+                } else {
+                    // 没有保存的状态，初始化
+                    updateDisplay('plant2', PLANT2_TIME);
+                }
+            }
+            
+            // 请求通知权限
+            function requestNotificationPermission() {
+                if ('Notification' in window) {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            showNotification('通知权限已启用', '当作物成熟时您会收到提醒');
+                            document.querySelector('.notification-permission').style.display = 'none';
+                        }
+                    });
+                }
+            }
+            
+            // 显示通知
+            function showNotification(title, message) {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(title, { body: message });
+                    
+                    // 如果启用了声音，播放提醒音
+                    if (soundCheckbox.checked) {
+                        alarmSound.play().catch(e => console.log('Audio play failed:', e));
+                    }
+                }
+            }
+            
+            // 格式化时间
+            function formatTime(seconds) {
+                const hrs = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // 更新进度环
+            function updateProgressCircle(progressElement, remaining, total) {
+                const circumference = 283; // 2 * π * r (r=45)
+                const offset = circumference - (remaining / total) * circumference;
+                progressElement.style.strokeDashoffset = offset;
+            }
+            
+            // 更新显示
+            function updateDisplay(plant, remaining) {
+                const isPlant1 = plant === 'plant1';
+                const totalTime = isPlant1 ? PLANT1_TIME : PLANT2_TIME;
+                const timeDisplay = isPlant1 ? timeDisplay1 : timeDisplay2;
+                const statusDisplay = isPlant1 ? status1 : status2;
+                const progressElement = isPlant1 ? progress1 : progress2;
+                
+                timeDisplay.textContent = formatTime(remaining);
+                updateProgressCircle(progressElement, remaining, totalTime);
+                
+                if (remaining <= 0) {
+                    showFinishedState(plant);
+                }
+            }
+            
+            // 显示结束状态
+            function showFinishedState(plant) {
+                const isPlant1 = plant === 'plant1';
+                const timeDisplay = isPlant1 ? timeDisplay1 : timeDisplay2;
+                const statusDisplay = isPlant1 ? status1 : status2;
+                const progressElement = isPlant1 ? progress1 : progress2;
+                const totalTime = isPlant1 ? PLANT1_TIME : PLANT2_TIME;
+                
+                timeDisplay.textContent = '00:00:00';
+                statusDisplay.textContent = '已成熟！';
+                statusDisplay.style.color = '#f44336';
+                updateProgressCircle(progressElement, 0, totalTime);
+                
+                timers[plant].finished = true;
+                
+                // 发送通知
+                const plantName = isPlant1 ? '14.4小时作物' : '3.6小时作物';
+                showNotification('作物已成熟', `您的${plantName}已经可以收获了！`);
+            }
+            
+            // 开始倒计时
+            function startTimer(plant, initialRemaining) {
+                const isPlant1 = plant === 'plant1';
+                const totalTime = isPlant1 ? PLANT1_TIME : PLANT2_TIME;
+                
+                // 清除现有的计时器
+                if (timers[plant].interval) {
+                    clearInterval(timers[plant].interval);
+                }
+                
+                // 保存开始时间到localStorage
+                const startTime = Math.floor(Date.now() / 1000) - (totalTime - initialRemaining);
+                localStorage.setItem(plant + 'Start', startTime.toString());
+                
+                let remaining = initialRemaining;
+                
+                timers[plant].interval = setInterval(() => {
+                    remaining--;
+                    
+                    if (remaining <= 0) {
+                        clearInterval(timers[plant].interval);
+                        showFinishedState(plant);
+                        // 清除保存的时间
+                        localStorage.removeItem(plant + 'Start');
+                    } else {
+                        updateDisplay(plant, remaining);
+                    }
+                }, 1000);
+            }
+            
+            // 重置倒计时
+            function resetTimer(plant) {
+                const isPlant1 = plant === 'plant1';
+                const totalTime = isPlant1 ? PLANT1_TIME : PLANT2_TIME;
+                
+                // 清除现有的计时器
+                if (timers[plant].interval) {
+                    clearInterval(timers[plant].interval);
+                }
+                
+                // 保存开始时间到localStorage
+                const startTime = Math.floor(Date.now() / 1000);
+                localStorage.setItem(plant + 'Start', startTime.toString());
+                
+                // 更新显示
+                updateDisplay(plant, totalTime);
+                
+                // 启动新计时器
+                startTimer(plant, totalTime);
+            }
+            
+            // 初始化进度环
+            progress1.style.strokeDasharray = '283';
+            progress2.style.strokeDasharray = '283';
+            
+            // 加载保存的状态
+            loadSavedState();
+            
+            // 添加事件监听器
+            resetBtn1.addEventListener('click', () => resetTimer('plant1'));
+            resetBtn2.addEventListener('click', () => resetTimer('plant2'));
+            enableNotificationsBtn.addEventListener('click', requestNotificationPermission);
+            
+            // 检查通知权限状态
+            if ('Notification' in window && Notification.permission === 'granted') {
+                document.querySelector('.notification-permission').style.display = 'none';
+            }
+            
+            // 添加页面可见性改变事件
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    // 页面重新可见，重新计算时间
+                    loadSavedState();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
