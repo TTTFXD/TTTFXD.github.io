@@ -245,7 +245,7 @@
         <div class="plant-card">
             <div class="plant-title">
                 <div class="plant-icon">🌱</div>
-                <div class="plant-name">14.4小时作物</div>
+                <div class="plant-name">12小时作物</div>
             </div>
             
             <div class="timer-container">
@@ -255,7 +255,7 @@
                         <circle class="progress" id="progress1" cx="50" cy="50" r="45" stroke-dasharray="283"></circle>
                     </svg>
                     <div class="time-display">
-                        <div id="time1" class="time">14:24:00</div>
+                        <div id="time1" class="time">12:00:00</div>
                         <div id="status1" class="status">生长中...</div>
                     </div>
                 </div>
@@ -267,7 +267,7 @@
         <div class="plant-card">
             <div class="plant-title">
                 <div class="plant-icon">🌿</div>
-                <div class="plant-name">3.6小时作物</div>
+                <div class="plant-name">3小时作物</div>
             </div>
             
             <div class="timer-container">
@@ -277,7 +277,7 @@
                         <circle class="progress" id="progress2" cx="50" cy="50" r="45" stroke-dasharray="283"></circle>
                     </svg>
                     <div class="time-display">
-                        <div id="time2" class="time">03:36:00</div>
+                        <div id="time2" class="time">03:00:00</div>
                         <div id="status2" class="status">生长中...</div>
                     </div>
                 </div>
@@ -307,8 +307,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // 作物生长时间（以秒为单位）
-            const PLANT1_TIME = 14.4 * 60 * 60;  // 14.4小时
-            const PLANT2_TIME = 3.6 * 60 * 60;   // 3.6小时
+            const PLANT1_TIME = 12 * 60 * 60;  // 12小时
+            const PLANT2_TIME = 3 * 60 * 60;   // 3小时
             
             // 获取DOM元素
             const timeDisplay1 = document.getElementById('time1');
@@ -450,7 +450,7 @@
                 timers[plant].finished = true;
                 
                 // 发送通知
-                const plantName = isPlant1 ? '14.4小时作物' : '3.6小时作物';
+                const plantName = isPlant1 ? '12小时作物' : '3小时作物';
                 showNotification('作物已成熟', `您的${plantName}已经可以收获了！`);
             }
             
